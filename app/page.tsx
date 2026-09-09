@@ -98,7 +98,8 @@ const categories = ["الكل", "أكل", "مشروبات", "حلويات", "إ�
 const categoryClass: Record<string, string> = { "أكل": "food", "مشروبات": "drinks", "حلويات": "desserts", "إلكترونيات": "tech", "موضة": "fashion", "المنزل": "home", "رياضة": "sports", "ترفيه": "fun" };
 const currency = new Intl.NumberFormat("ar-SA", { style: "currency", currency: "SAR", minimumFractionDigits: 2 });
 const halalas = (value: number) => `${value.toLocaleString("ar-SA")} هللة`;
-const priceText = (value: number) => `${(value / 100).toFixed(2)}`;
+const priceFormatter = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const priceText = (value: number) => priceFormatter.format(value / 100);
 const normalizeArabic = (value: string) => value.trim().toLocaleLowerCase("ar").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي");
 const readStorage = <T,>(key: string, fallback: T): T => {
   try {
@@ -153,11 +154,17 @@ export default function Home() {
   const [urlReady, setUrlReady] = useState(false);
 
   useEffect(() => {
-    setCart(readStorage<Record<number, number>>("wish-cart", {}));
+    const storedCart = readStorage<Record<number, number>>("wish-cart", {}) || {};
+    const validCart = Object.fromEntries(Object.entries(storedCart).filter(([id, quantity]) => {
+      const productId = Number(id);
+      return products.some((product) => product.id === productId) && Number.isInteger(quantity) && quantity > 0 && quantity < 100;
+    }));
+    setCart(validCart);
     setUser(readStorage<User | null>("wish-user", null));
     setWallet(readStorage<number>("wish-wallet", 0));
     setOrders(readStorage<Order[]>("wish-orders", []));
-    setFavorites(readStorage<number[]>("wish-favorites", []));
+    const storedFavorites = readStorage<number[]>("wish-favorites", []);
+    setFavorites(Array.isArray(storedFavorites) ? storedFavorites.filter((id) => products.some((product) => product.id === id)) : []);
     setEmailUpdates(readStorage<boolean>("wish-email-updates", true));
     setReward(readStorage<string>("wish-reward-date", "") === new Date().toISOString().slice(0, 10));
     const params = new URLSearchParams(window.location.search);
