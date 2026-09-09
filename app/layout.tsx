@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "وِشّ | اشترِ إحساسًا",
+  title: "وِشّ | وش نفسك تملك اليوم؟",
   description: "وِشّ متجر ترفيهي عربي لشراء لحظات ومنتجات افتراضية بأسعار رمزية. لا شحن ولا توصيل، فقط تجربة خفيفة وممتعة.",
   metadataBase: new URL("https://bsx507-del.github.io/wish-store/"),
   openGraph: {
-    title: "وِشّ | اشترِ الشيء الذي لا تحتاجه",
-    description: "منتجات افتراضية بأسعار رمزية. لا شحن ولا توصيل، فقط لحظة ممتعة.",
+    title: "وِشّ | وش نفسك تملك اليوم؟",
+    description: "أمنيات كبيرة وأسعار صغيرة. منتجات افتراضية للمتعة فقط، بدون شحن أو توصيل.",
     url: "https://bsx507-del.github.io/wish-store/",
     siteName: "وِشّ",
     locale: "ar_SA",

@@ -217,7 +217,7 @@ export default function Home() {
     window.setTimeout(() => setShareMessage(""), 2800);
   };
   const shareSite = async () => {
-    const shareData = { title: "وِشّ | اشترِ إحساسًا", text: "جرّبوا وِشّ: متجر ترفيهي لمنتجات افتراضية بأسعار رمزية. لا شحن ولا توصيل.", url: window.location.href };
+    const shareData = { title: "وِشّ | وش نفسك تملك اليوم؟", text: "جرّبوا وِشّ: أمنيات كبيرة وأسعار صغيرة، بدون شحن أو توصيل.", url: window.location.href };
     const canShare = Boolean(navigator.share);
     try {
       if (canShare) await navigator.share(shareData);
@@ -309,8 +309,8 @@ export default function Home() {
         <section className="hero-modern">
           <div className="hero-copy">
             <span className="eyebrow"><i /> مساحة صغيرة لمزاج أفضل</span>
-            <h1>اشترِ الشيء<br /><em>الذي لا تحتاجه.</em></h1>
-            <p>وِشّ متجر ترفيهي تشتري منه أشياء افتراضية بأسعار رمزية. قهوة، سيارة، جزيرة أو قصر… لا شحن ولا توصيل، فقط لحظة ممتعة.</p>
+            <h1>وش نفسك<br /><em>تملك اليوم؟</em></h1>
+            <p>أمنيات كبيرة، أسعار صغيرة، ولحظات افتراضية خفيفة. اختر قهوة، سيارة، جزيرة أو قصر… بدون شحن ولا توصيل.</p>
             <div className="hero-actions"><button className="button-primary" onClick={() => document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" })}>ابدأ الاستكشاف <Icon name="arrow" /></button><button className="button-soft launch-share" onClick={() => void shareSite()}>شارك وِشّ ↗</button><span className="hero-note">منتجات رقمية فقط · تجربة آمنة</span></div>
           </div>
           <div className="hero-art" aria-hidden="true"><div className="art-orb orb-one" /><div className="art-orb orb-two" /><div className="art-card"><span>01</span><strong>لحظة<br />لك</strong><small>تستحقها اليوم</small></div><div className="art-chip chip-one">✦ هدية رقمية</div><div className="art-chip chip-two">مزاج ↑</div></div>
