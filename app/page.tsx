@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-type Product = { id: number; name: string; category: string; price: number; emoji: string; tag?: string; description: string };
+type Product = { id: number; name: string; category: string; price: number; emoji: string; image: string; tag?: string; description: string };
 type User = { email: string; joinedAt: string };
 
 const catalogSeed: Array<[string, number, string, string]> = [
@@ -21,6 +21,16 @@ const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category
   category,
   price: halalaPrice,
   emoji,
+  image: ({
+    "أكل": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85",
+    "مشروبات": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",
+    "حلويات": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=85",
+    "إلكترونيات": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=85",
+    "موضة": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=85",
+    "المنزل": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85",
+    "رياضة": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=85",
+    "ترفيه": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=85",
+  } as Record<string, string>)[category],
   tag: index === 0 ? "الأكثر طلبًا" : index === 65 ? "مميز" : index === 1 ? "جديد" : undefined,
   description: "منتج افتراضي للمتعة فقط، لا يوجد شحن أو توصيل",
 }));
@@ -28,7 +38,7 @@ const categories = ["الكل", "أكل", "مشروبات", "حلويات", "إ�
 const categoryClass: Record<string, string> = { "أكل": "food", "مشروبات": "drinks", "حلويات": "desserts", "إلكترونيات": "tech", "موضة": "fashion", "المنزل": "home", "رياضة": "sports", "ترفيه": "fun" };
 const currency = new Intl.NumberFormat("ar-SA", { style: "currency", currency: "SAR", minimumFractionDigits: 2 });
 const halalas = (value: number) => `${value.toLocaleString("ar-SA")} هللة`;
-const priceText = (value: number) => `${halalas(value)} · ${currency.format(value / 100)}`;
+const priceText = (value: number) => `${(value / 100).toFixed(2)}`;
 
 function Icon({ name }: { name: "arrow" | "cart" | "user" | "search" | "close" | "check" }) {
   const paths = {
@@ -50,6 +60,9 @@ export default function Home() {
   const [authOpen, setAuthOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [emailUpdates, setEmailUpdates] = useState(true);
+  const [wallet, setWallet] = useState(0);
+  const [walletOpen, setWalletOpen] = useState(false);
+  const [walletMessage, setWalletMessage] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("mada");
@@ -102,6 +115,17 @@ export default function Home() {
     setReward(true);
     setRewardMessage("أضفنا ٢٥ هللة رمزية لرصيدك التجريبي.");
   };
+  const payOrder = () => {
+    const payable = Math.max(0, total - (reward ? 25 : 0));
+    if (wallet < payable) {
+      setCheckoutOpen(false);
+      setWalletOpen(true);
+      setWalletMessage(`رصيدك ${priceText(wallet)} ر.س، وتحتاج ${priceText(payable)} ر.س لإتمام السلة.`);
+      return;
+    }
+    setWallet(wallet - payable);
+    setOrderComplete(true);
+  };
   const startCheckout = () => {
     if (!user) {
       setAuthMessage("سجّل بريدك أولًا حتى نحفظ طلبك ونفتح خطوة الدفع.");
@@ -119,6 +143,7 @@ export default function Home() {
         <a className="brand" href="#" aria-label="وِشّ، الصفحة الرئيسية"><span className="brand-mark">و</span><span>وِشّ</span></a>
         <nav className="nav-links" aria-label="التنقل الرئيسي"><a href="#shop">اكتشف</a><a href="#business">كيف نكسب؟</a><a href="#rewards">المكافآت</a></nav>
         <div className="top-actions">
+          <button className="wallet-button" onClick={() => setWalletOpen(true)} aria-label={`الرصيد ${priceText(wallet)} ريال`}><span>رصيدي</span><b>{priceText(wallet)}</b></button>
           <button className="account-button" onClick={() => setAuthOpen(true)}><Icon name="user" />{user ? "حسابي" : "دخول بالبريد"}</button>
           <button className="cart-button" onClick={() => setCartOpen(true)} aria-label={`فتح السلة، ${count} منتجات`}><Icon name="cart" />{count > 0 && <b className="cart-count">{count}</b>}</button>
         </div>
@@ -140,7 +165,7 @@ export default function Home() {
         <section id="shop" className="shop-section">
           <div className="section-heading"><div><span className="section-kicker">المتجر الافتراضي</span><h2>وش تشتري لو ما فيه حدود؟</h2><p>تصفح أشياء ممتعة، رمزية، ولا تصل إلى باب بيتك.</p></div><label className="search-box"><Icon name="search" /><input aria-label="ابحث في المنتجات" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن قهوة، جزيرة…" /></label></div>
           <div className="filters" aria-label="تصنيف المنتجات">{categories.map((item) => <button key={item} className={category === item ? "filter active" : "filter"} onClick={() => setCategory(item)}>{item}</button>)}</div>
-          <div className="product-grid">{filtered.map((product) => <article className="product-card" key={product.id}><div className={`product-visual visual-${categoryClass[product.category]}`}><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{priceText(product.price)}</strong><button className="add-button" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></div></article>)}</div>
+          <div className="product-grid">{filtered.map((product) => <article className="product-card" key={product.id}><div className={`product-visual visual-${categoryClass[product.category]}`}><img src={product.image} alt={product.name} loading="lazy" /><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{priceText(product.price)}</strong><button className="add-button" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></div></article>)}</div>
           {filtered.length === 0 && <div className="empty">لم نجد ما تبحث عنه. جرّب كلمة أخرى…</div>}
         </section>
 
@@ -150,12 +175,13 @@ export default function Home() {
         <footer className="footer"><span>© 2026 وِشّ</span><span>منتجات افتراضية · الدفع الحقيقي يُفعّل عند الإطلاق</span></footer>
       </div>
 
-      {cartOpen && <div className="overlay" role="presentation" onClick={() => setCartOpen(false)}><aside className="drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" onClick={(event) => event.stopPropagation()}><div className="drawer-head"><div><span className="section-kicker">مراجعة هادئة</span><h2 id="cart-title">سلتك <small>({count})</small></h2></div><button className="icon-close" onClick={() => setCartOpen(false)} aria-label="إغلاق السلة"><Icon name="close" /></button></div>{cartItems.length === 0 ? <div className="empty">السلة فاضية حاليًا.<br />خذ وقتك وتصفح المنتجات.</div> : <>{cartItems.map((product) => <div className="cart-line" key={product.id}><span className="cart-emoji">{product.emoji}</span><div><strong>{product.name}</strong><small>{priceText(product.price)}</small></div><div className="quantity"><button onClick={() => remove(product.id)} aria-label={`تقليل ${product.name}`}>−</button><b>{cart[product.id]}</b><button onClick={() => add(product.id)} aria-label={`زيادة ${product.name}`}>+</button></div></div>)}<div className="cart-total"><span>الإجمالي</span><strong>{priceText(Math.max(0, total - (reward ? 25 : 0)))}</strong><small>منتجات افتراضية · لا يوجد شحن</small></div><button className="checkout-button" onClick={startCheckout}>{user ? "المتابعة بهدوء" : "تسجيل البريد للمتابعة"}</button></>}</aside></div>}
+      {cartOpen && <div className="overlay" role="presentation" onClick={() => setCartOpen(false)}><aside className="drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" onClick={(event) => event.stopPropagation()}><div className="drawer-head"><div><span className="section-kicker">مراجعة هادئة</span><h2 id="cart-title">سلتك <small>({count})</small></h2></div><button className="icon-close" onClick={() => setCartOpen(false)} aria-label="إغلاق السلة"><Icon name="close" /></button></div>{cartItems.length === 0 ? <div className="empty">السلة فاضية حاليًا.<br />خذ وقتك وتصفح المنتجات.</div> : <>{cartItems.map((product) => <div className="cart-line" key={product.id}><img className="cart-emoji" src={product.image} alt="" /><div><strong>{product.name}</strong><small>{priceText(product.price)} ر.س</small></div><div className="quantity"><button onClick={() => remove(product.id)} aria-label={`تقليل ${product.name}`}>−</button><b>{cart[product.id]}</b><button onClick={() => add(product.id)} aria-label={`زيادة ${product.name}`}>+</button></div></div>)}<div className="cart-total"><span>الإجمالي</span><strong>{priceText(Math.max(0, total - (reward ? 25 : 0)))} <small>ر.س</small></strong><small>منتجات افتراضية · لا يوجد شحن</small></div><div className="wallet-hint">رصيدك الحالي: <b>{priceText(wallet)} ر.س</b></div><button className="checkout-button" onClick={startCheckout}>{user ? "المتابعة بهدوء" : "تسجيل البريد للمتابعة"}</button></>}</aside></div>}
 
-      {checkoutOpen && <div className="modal-wrap" onClick={() => setCheckoutOpen(false)}><section className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onClick={(event) => event.stopPropagation()}>{orderComplete ? <div className="order-success"><div className="success-mark"><Icon name="check" /></div><span className="section-kicker">تم حفظ طلبك</span><h2>جاهز للحظة حلوة 🎉</h2><p>هذا تأكيد تجريبي فقط. عند تفعيل Stripe أو مدى سيصلك رابط الدفع الحقيقي هنا.</p><button className="button-dark full-button" onClick={() => { setCheckoutOpen(false); setOrderComplete(false); setCart({}); }}>العودة للمتجر</button></div> : <><div className="drawer-head"><div><span className="section-kicker">الخطوة الأخيرة</span><h2 id="checkout-title">أكمل طلبك</h2></div><button className="icon-close" onClick={() => setCheckoutOpen(false)} aria-label="إغلاق الدفع"><Icon name="close" /></button></div><div className="checkout-total"><span>الإجمالي التجريبي</span><strong>{priceText(Math.max(0, total - (reward ? 25 : 0)))}</strong></div><p className="checkout-disclaimer">الدفع الحقيقي غير موصول حاليًا. اختر وسيلة الدفع لتجربة الشكل النهائي بدون خصم أي مبلغ.</p><fieldset className="payment-options"><legend>طريقة الدفع</legend>{[["mada", "مدى", "بطاقة مدى السعودية"], ["card", "بطاقة بنكية", "Visa أو Mastercard"], ["apple", "Apple Pay", "دفع سريع من الجوال"]].map(([value, title, detail]) => <label className={paymentMethod === value ? "payment-option selected" : "payment-option"} key={value}><input type="radio" name="payment" value={value} checked={paymentMethod === value} onChange={(event) => setPaymentMethod(event.target.value)} /><span className="payment-logo">{value === "apple" ? "" : value === "mada" ? "مدى" : "•••"}</span><span><strong>{title}</strong><small>{detail}</small></span><i>✓</i></label>)}</fieldset><button className="checkout-button" onClick={() => setOrderComplete(true)}>تأكيد الطلب التجريبي <Icon name="arrow" /></button><small className="secure-note">🔒 لا يتم خصم أي مبلغ في هذه النسخة التجريبية</small></>}</section></div>}
+      {checkoutOpen && <div className="modal-wrap" onClick={() => setCheckoutOpen(false)}><section className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onClick={(event) => event.stopPropagation()}>{orderComplete ? <div className="order-success"><div className="success-mark"><Icon name="check" /></div><span className="section-kicker">تم حفظ طلبك</span><h2>جاهز للحظة حلوة 🎉</h2><p>تم الخصم من رصيدك التجريبي. عند تفعيل الدفع الحقيقي سيصلك رابط المنتج هنا.</p><button className="button-dark full-button" onClick={() => { setCheckoutOpen(false); setOrderComplete(false); setCart({}); }}>العودة للمتجر</button></div> : <><div className="drawer-head"><div><span className="section-kicker">الخطوة الأخيرة</span><h2 id="checkout-title">أكمل طلبك</h2></div><button className="icon-close" onClick={() => setCheckoutOpen(false)} aria-label="إغلاق الدفع"><Icon name="close" /></button></div><div className="checkout-total"><span>الإجمالي التجريبي</span><strong>{priceText(Math.max(0, total - (reward ? 25 : 0)))} <small>ر.س</small></strong></div><div className="balance-check"><span>رصيدك الحالي</span><strong>{priceText(wallet)} ر.س</strong></div><p className="checkout-disclaimer">اختر وسيلة الدفع لتوثيق الشكل النهائي. في النسخة الحالية يتم الخصم من الرصيد التجريبي فقط.</p><fieldset className="payment-options"><legend>طريقة الدفع</legend><label className="payment-option selected"><input type="radio" name="payment" checked readOnly /><span className="payment-logo">وِشّ</span><span><strong>رصيد وِشّ</strong><small>المحفظة التجريبية</small></span><i>✓</i></label>{[["mada", "مدى", "عند الإطلاق"], ["card", "بطاقة بنكية", "Visa أو Mastercard"], ["apple", "Apple Pay", "دفع سريع من الجوال"]].map(([value, title, detail]) => <label className="payment-option muted-option" key={value}><input type="radio" name="payment" value={value} checked={paymentMethod === value} onChange={(event) => setPaymentMethod(event.target.value)} /><span className="payment-logo">{value === "apple" ? "" : value === "mada" ? "مدى" : "•••"}</span><span><strong>{title}</strong><small>{detail}</small></span><i>قريبًا</i></label>)}</fieldset><button className="checkout-button" onClick={payOrder}>الدفع من رصيدي <Icon name="arrow" /></button><small className="secure-note">🔒 لا يتم خصم أي مبلغ حقيقي في هذه النسخة</small></>}</section></div>}
 
       {authOpen && <div className="modal-wrap" onClick={() => setAuthOpen(false)}><section className="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title" onClick={(event) => event.stopPropagation()}><button className="icon-close modal-close" onClick={() => setAuthOpen(false)} aria-label="إغلاق نافذة الحساب"><Icon name="close" /></button><div className="auth-symbol">و</div><span className="section-kicker">مساحتك في وِشّ</span><h2 id="auth-title">{user ? "أهلًا بعودتك" : "احفظ أمنياتك بهدوء"}</h2><p>{user ? `مسجل بالبريد: ${user.email}` : "استخدم بريدك فقط. لا كلمة مرور، ولا رسائل مزعجة."}</p>{user ? <><button className="button-soft full-button" onClick={() => { setSettingsOpen(true); setAuthOpen(false); }}>الإعدادات والتفضيلات</button><button className="button-dark full-button" onClick={() => { setUser(null); window.localStorage.removeItem("wish-user"); setAuthOpen(false); }}>تسجيل الخروج</button></> : <form onSubmit={signUp}><label htmlFor="email">البريد الإلكتروني</label><input id="email" name="email" type="email" autoComplete="email" spellCheck={false} placeholder="name@example.com" required /><button className="button-dark full-button" type="submit">إنشاء حساب بالبريد <Icon name="arrow" /></button>{authError && <p className="form-error" role="alert">{authError}</p>}{authMessage && <p className="form-success" aria-live="polite">{authMessage}</p>}</form>}<small className="auth-footnote"><Icon name="check" /> حساب تجريبي محلي الآن، وجاهز للربط بتسجيل دخول حقيقي عند الإطلاق.</small></section></div>}
       {settingsOpen && <div className="modal-wrap" onClick={() => setSettingsOpen(false)}><section className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title" onClick={(event) => event.stopPropagation()}><div className="drawer-head"><div><span className="section-kicker">تخصيص بسيط</span><h2 id="settings-title">الإعدادات</h2></div><button className="icon-close" onClick={() => setSettingsOpen(false)} aria-label="إغلاق الإعدادات"><Icon name="close" /></button></div><div className="settings-profile"><div className="profile-avatar">{user?.email.slice(0, 1).toUpperCase()}</div><div><strong>{user?.email}</strong><small>حساب تجريبي محلي</small></div></div><label className="setting-row"><span><strong>رسائل المنتجات الجديدة</strong><small>أرسلوا لي مفاجآت وكتالوجات جديدة</small></span><input type="checkbox" checked={emailUpdates} onChange={(event) => setEmailUpdates(event.target.checked)} /></label><div className="settings-note">يمكن ربط الإشعارات وتسجيل الدخول الحقيقي عند إضافة مزود مصادقة مثل Supabase أو Clerk.</div><button className="button-dark full-button" onClick={() => setSettingsOpen(false)}>حفظ والعودة</button></section></div>}
+      {walletOpen && <div className="modal-wrap" onClick={() => setWalletOpen(false)}><section className="wallet-modal" role="dialog" aria-modal="true" aria-labelledby="wallet-title" onClick={(event) => event.stopPropagation()}><button className="icon-close modal-close" onClick={() => setWalletOpen(false)} aria-label="إغلاق المحفظة"><Icon name="close" /></button><div className="wallet-hero"><span>رصيدك</span><strong>{priceText(wallet)} <small>ر.س</small></strong><p>اشحن مرة، وتسوق براحة. هذه المحفظة تجريبية ولا يتم خصم أي مبلغ حقيقي.</p></div><h2 id="wallet-title">اختر قيمة الشحن</h2><div className="topup-grid">{[100, 500, 1000, 2000].map((amount) => <button key={amount} onClick={() => { setWallet(wallet + amount); setWalletMessage(`أضفنا ${priceText(amount)} ر.س إلى رصيدك التجريبي.`); }}>{priceText(amount)} <small>ر.س</small></button>)}</div>{walletMessage && <p className="form-success" aria-live="polite">{walletMessage}</p>}<small className="auth-footnote"><Icon name="check" /> الدفع الحقيقي يُفعّل لاحقًا عبر مزود دفع معتمد.</small></section></div>}
     </main>
   );
 }
