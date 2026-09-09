@@ -16,24 +16,24 @@ const catalogSeed: Array<[string, number, string, string]> = [
   ["جزيرة خاصة", 80, "🏝️", "ترفيه"], ["سيارة أحلامك", 75, "🏎️", "ترفيه"], ["قصر على السحاب", 120, "🏰", "ترفيه"], ["رحلة إلى القمر", 60, "🚀", "ترفيه"], ["نجمة الحظ", 2, "🌟", "ترفيه"], ["سحابة أمنيات", 5, "☁️", "ترفيه"],
 ];
 const imageKeywords: Record<string, string> = {
-  "أكل": "food",
-  "مشروبات": "drinks",
-  "حلويات": "dessert",
-  "إلكترونيات": "technology",
-  "موضة": "fashion",
-  "المنزل": "interior",
-  "رياضة": "fitness",
-  "ترفيه": "travel",
+  "🍔": "burger", "🍕": "pizza", "🥪": "sandwich", "🥗": "salad", "🍲": "soup", "🍳": "eggs", "🥖": "bread", "🧀": "cheese", "🥩": "steak", "🐟": "grilled-fish", "🍎": "red-apple", "🍒": "cherries", "🥕": "carrot", "🍄": "mushroom", "🍿": "popcorn",
+  "🥤": "soda", "🧋": "iced-coffee", "🍵": "tea", "🥭": "mango-juice", "🍊": "orange-juice", "☕": "espresso", "🥛": "chocolate-milk", "🍹": "mojito", "🍋": "lemonade", "💧": "sparkling-water",
+  "🍩": "donut", "🍓": "strawberry-ice-cream", "🍰": "chocolate-cake", "🍫": "chocolate", "🍬": "candy", "🍪": "cookies", "🧁": "baklava", "🫐": "blueberry-muffin",
+  "🎧": "wireless-headphones", "⌚": "smartwatch", "📱": "smartphone", "💻": "laptop", "📷": "professional-camera", "📺": "television", "⌨️": "keyboard", "🖱️": "computer-mouse", "🖨️": "printer", "🎮": "game-controller", "🎙️": "podcast-microphone",
+  "👕": "cotton-tshirt", "🕶️": "sunglasses", "👜": "handbag", "🎒": "backpack", "💍": "silver-ring", "💎": "diamond-necklace", "🧥": "fashion-jacket", "👑": "crown",
+  "🛋️": "comfortable-sofa", "🛏️": "bedroom", "💡": "lamp", "🕯️": "scented-candle", "🪴": "house-plant", "🖼️": "art-painting", "🚪": "wooden-door", "🛁": "bathtub",
+  "⚽": "soccer-ball", "🏀": "basketball", "🚲": "bicycle", "🏋️": "gym-weights", "🎾": "tennis-racket", "👟": "running-shoes", "🪢": "jump-rope",
+  "🏝️": "private-island", "🏎️": "sports-car", "🏰": "castle", "🚀": "moon-rocket", "🌟": "lucky-star", "☁️": "dream-cloud",
 };
-const productImage = (category: string, index: number) =>
-  `https://loremflickr.com/900/600/${imageKeywords[category]}?lock=${index + 410}&sig=${index}`;
+const productImage = (emoji: string, index: number) =>
+  `https://loremflickr.com/900/600/${imageKeywords[emoji] || "abstract-product"}?lock=${index + 410}&sig=${index}`;
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
   category,
   price: halalaPrice,
   emoji,
-  image: productImage(category, index),
+  image: productImage(emoji, index),
   tag: index === 0 ? "الأكثر طلبًا" : index === 65 ? "مميز" : index === 1 ? "جديد" : undefined,
   description: "منتج افتراضي للمتعة فقط، لا يوجد شحن أو توصيل",
 }));
