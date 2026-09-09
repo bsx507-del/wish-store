@@ -26,10 +26,36 @@ const imageKeywords: Record<string, string> = {
   "🏝️": "private-island", "🏎️": "sports-car", "🏰": "castle", "🚀": "moon-rocket", "🌟": "lucky-star", "☁️": "dream-cloud",
 };
 const escapeSvg = (value: string) => value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[character] || character);
+const productArtwork = (emoji: string, hue: number) => {
+  const stroke = "#d9ff8a";
+  const fill = `hsl(${hue} 45% 44%)`;
+  if (["🍔", "🍕", "🥪", "🥗", "🍲", "🍳", "🥖", "🧀", "🥩", "🐟", "🍎", "🍒", "🥕", "🍄", "🍿"].includes(emoji)) {
+    return `<ellipse cx="450" cy="410" rx="250" ry="42" fill="#010403" opacity=".45"/><path d="M220 350 Q450 175 680 350 V390 H220Z" fill="${fill}" stroke="${stroke}" stroke-width="8"/><path d="M250 390h400" stroke="${stroke}" stroke-width="18" stroke-linecap="round"/><path d="M290 435h320" stroke="#d9ff8a" stroke-width="11" stroke-linecap="round" opacity=".75"/><circle cx="355" cy="280" r="13" fill="${stroke}"/><circle cx="480" cy="250" r="10" fill="${stroke}"/><circle cx="550" cy="300" r="14" fill="${stroke}"/>`;
+  }
+  if (["🥤", "🧋", "🍵", "🥭", "🍊", "☕", "🥛", "🍹", "🍋", "💧"].includes(emoji)) {
+    return `<ellipse cx="450" cy="475" rx="160" ry="28" fill="#010403" opacity=".5"/><path d="M335 205h230l-22 250H357Z" fill="${fill}" stroke="${stroke}" stroke-width="8"/><path d="M420 205L490 78" stroke="${stroke}" stroke-width="12" stroke-linecap="round"/><path d="M372 270h156" stroke="${stroke}" stroke-width="7" opacity=".7"/><circle cx="440" cy="330" r="17" fill="#d9ff8a" opacity=".65"/><circle cx="490" cy="390" r="12" fill="#d9ff8a" opacity=".65"/>`;
+  }
+  if (["🍩", "🍓", "🍰", "🍫", "🍬", "🍪", "🧁", "🫐"].includes(emoji)) {
+    return `<ellipse cx="450" cy="465" rx="245" ry="32" fill="#010403" opacity=".5"/><path d="M235 400 Q450 300 665 400v35H235Z" fill="${fill}" stroke="${stroke}" stroke-width="8"/><path d="M285 330 Q450 155 615 330" fill="none" stroke="${stroke}" stroke-width="28" stroke-linecap="round"/><circle cx="355" cy="250" r="14" fill="${stroke}"/><circle cx="470" cy="215" r="11" fill="${stroke}"/><circle cx="550" cy="270" r="13" fill="${stroke}"/>`;
+  }
+  if (["🎧", "⌚", "📱", "💻", "📷", "📺", "⌨️", "🖱️", "🖨️", "🎮", "🎙️"].includes(emoji)) {
+    return `<rect x="245" y="145" width="410" height="280" rx="28" fill="${fill}" stroke="${stroke}" stroke-width="9"/><rect x="285" y="185" width="330" height="190" rx="14" fill="#06100a" stroke="#9bea6a" stroke-width="5"/><path d="M210 465h480" stroke="${stroke}" stroke-width="14" stroke-linecap="round"/><circle cx="450" cy="280" r="42" fill="#d9ff8a" opacity=".22"/><path d="M430 280h40M450 260v40" stroke="${stroke}" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  if (["👕", "🕶️", "👜", "🎒", "💍", "💎", "🧥", "👑"].includes(emoji)) {
+    return `<path d="M330 170l-105 75 55 75 42-30v190h256V290l42 30 55-75-105-75-70 55h-100Z" fill="${fill}" stroke="${stroke}" stroke-width="9" stroke-linejoin="round"/><path d="M405 190q45 55 90 0" fill="none" stroke="${stroke}" stroke-width="8"/>`;
+  }
+  if (["🛋️", "🛏️", "💡", "🕯️", "🪴", "🖼️", "🚪", "🛁"].includes(emoji)) {
+    return `<rect x="240" y="245" width="420" height="220" rx="30" fill="${fill}" stroke="${stroke}" stroke-width="9"/><rect x="285" y="195" width="330" height="115" rx="25" fill="#06100a" stroke="${stroke}" stroke-width="8"/><path d="M320 465v45M580 465v45" stroke="${stroke}" stroke-width="12" stroke-linecap="round"/><circle cx="450" cy="270" r="34" fill="#d9ff8a" opacity=".45"/>`;
+  }
+  if (["⚽", "🏀", "🚲", "🏋️", "🎾", "👟", "🪢"].includes(emoji)) {
+    return `<circle cx="450" cy="315" r="150" fill="${fill}" stroke="${stroke}" stroke-width="10"/><path d="M450 165v300M300 315h300M345 210l210 210M555 210L345 420" stroke="${stroke}" stroke-width="8" opacity=".8"/><ellipse cx="450" cy="490" rx="220" ry="25" fill="#010403" opacity=".5"/>`;
+  }
+  return `<circle cx="450" cy="305" r="155" fill="${fill}" stroke="${stroke}" stroke-width="10"/><circle cx="450" cy="305" r="95" fill="#06100a" stroke="${stroke}" stroke-width="6"/><path d="M450 110v390M255 305h390" stroke="${stroke}" stroke-width="5" opacity=".55"/><ellipse cx="450" cy="490" rx="220" ry="25" fill="#010403" opacity=".5"/>`;
+};
 const productImage = (name: string, emoji: string, category: string, index: number) => {
   const keyword = imageKeywords[emoji] || "premium product";
   const hue = (index * 47) % 360;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07130d"/><stop offset=".55" stop-color="hsl(${hue} 42% 28%)"/><stop offset="1" stop-color="#b8f56b"/></linearGradient><filter id="blur"><feGaussianBlur stdDeviation="34"/></filter></defs><rect width="900" height="600" fill="url(#g)"/><circle cx="${150 + (index * 37) % 620}" cy="160" r="150" fill="#d7ff8a" opacity=".22" filter="url(#blur)"/><path d="M0 490 C180 380 290 570 460 455 S740 350 900 470 V600 H0Z" fill="#020604" opacity=".72"/><text x="58" y="92" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">${escapeSvg(category.toUpperCase())}</text><text x="58" y="430" fill="#fff" font-family="Arial,sans-serif" font-size="42" font-weight="700">${escapeSvg(keyword.replace(/-/g, " "))}</text><text x="58" y="486" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="28">${escapeSvg(name)}</text><circle cx="760" cy="120" r="58" fill="none" stroke="#d8ff9c" stroke-width="2" opacity=".7"/><circle cx="760" cy="120" r="34" fill="none" stroke="#d8ff9c" stroke-width="1" opacity=".55"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07130d"/><stop offset=".55" stop-color="hsl(${hue} 42% 28%)"/><stop offset="1" stop-color="#b8f56b"/></linearGradient></defs><rect width="900" height="600" fill="url(#g)"/><path d="M0 520 C180 435 300 580 470 475 S740 395 900 490 V600 H0Z" fill="#020604" opacity=".72"/>${productArtwork(emoji, hue)}<text x="58" y="92" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">${escapeSvg(category.toUpperCase())}</text><text x="58" y="555" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="26">${escapeSvg(name)}</text></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 };
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
