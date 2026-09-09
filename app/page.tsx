@@ -17,6 +17,14 @@ const catalogSeed: Array<[string, number, string, string]> = [
   ["كرة قدم", 22, "⚽", "رياضة"], ["كرة سلة", 24, "🏀", "رياضة"], ["دراجة هوائية", 50, "🚲", "رياضة"], ["أثقال رياضية", 32, "🏋️", "رياضة"], ["مضرب تنس", 28, "🎾", "رياضة"], ["حذاء رياضي", 35, "👟", "رياضة"], ["حبل قفز", 10, "🪢", "رياضة"],
   ["جزيرة خاصة", 80, "🏝️", "ترفيه"], ["سيارة أحلامك", 75, "🏎️", "ترفيه"], ["قصر على السحاب", 120, "🏰", "ترفيه"], ["رحلة إلى القمر", 60, "🚀", "ترفيه"], ["نجمة الحظ", 2, "🌟", "ترفيه"], ["سحابة أمنيات", 5, "☁️", "ترفيه"],
 ];
+const catalogVariants = ["كلاسيكي", "ذهبي", "ليلي", "صيفي", "فاخر", "هادئ", "سريع", "مميز", "بسيط", "جريء", "ملون", "محدود"];
+const expandedCatalog: Array<[string, number, string, string]> = Array.from({ length: 1200 }, (_, index) => {
+  const seed = catalogSeed[index % catalogSeed.length];
+  const variant = catalogVariants[Math.floor(index / catalogSeed.length) % catalogVariants.length];
+  const cycle = Math.floor(index / (catalogSeed.length * catalogVariants.length)) + 1;
+  return [`${seed[0]} · ${variant} ${cycle}`, seed[1] + ((index * 7) % 19), seed[2], seed[3]];
+});
+const fullCatalogSeed = [...catalogSeed, ...expandedCatalog];
 const imageKeywords: Record<string, string> = {
   "🍔": "burger", "🍕": "pizza", "🥪": "sandwich", "🥗": "salad", "🍲": "soup", "🍳": "eggs", "🥖": "bread", "🧀": "cheese", "🥩": "steak", "🐟": "grilled-fish", "🍎": "red-apple", "🍒": "cherries", "🥕": "carrot", "🍄": "mushroom", "🍿": "popcorn",
   "🥤": "soda", "🧋": "iced-coffee", "🍵": "tea", "🥭": "mango-juice", "🍊": "orange-juice", "☕": "espresso", "🥛": "chocolate-milk", "🍹": "mojito", "🍋": "lemonade", "💧": "sparkling-water",
@@ -76,7 +84,7 @@ const fallbackPhotos: Record<string, string> = {
   "ترفيه": "photo-1500534623283-312aade485b7",
 };
 const fallbackImage = (category: string) => `https://images.unsplash.com/${fallbackPhotos[category]}?auto=format&fit=crop&w=900&q=88`;
-const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
+const products: Product[] = fullCatalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
   category,
@@ -118,6 +126,7 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [sortMode, setSortMode] = useState("featured");
   const [favoriteOnly, setFavoriteOnly] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(48);
   const [cart, setCart] = useState<Record<number, number>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -220,6 +229,7 @@ export default function Home() {
     const result = products.filter((p) => (category === "الكل" || p.category === category) && normalizeArabic(p.name).includes(normalizedQuery) && (!favoriteOnly || favorites.includes(p.id)));
     return [...result].sort((a, b) => sortMode === "price-low" ? a.price - b.price : sortMode === "price-high" ? b.price - a.price : sortMode === "name" ? a.name.localeCompare(b.name, "ar") : a.id - b.id);
   }, [category, query, favoriteOnly, favorites, sortMode]);
+  useEffect(() => { setVisibleCount(48); }, [category, query, favoriteOnly, sortMode]);
   const cartItems = products.filter((p) => cart[p.id]);
   const count = Object.values(cart).reduce((sum, value) => sum + value, 0);
   const total = cartItems.reduce((sum, p) => sum + p.price * (cart[p.id] || 0), 0);
@@ -354,8 +364,9 @@ export default function Home() {
         <section id="shop" className="shop-section">
           <div className="section-heading"><div><span className="section-kicker">اختيارات اليوم</span><h2>خذ لك لحظة على ذوقك</h2><p>تصفح مجموعتنا، واحفظ الأشياء التي لفتت انتباهك.</p></div><label className="search-box"><Icon name="search" /><input aria-label="ابحث في المنتجات" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن قهوة، جزيرة…" /></label></div>
           <div className="filters" aria-label="تصنيف المنتجات">{categories.map((item) => <button key={item} className={category === item ? "filter active" : "filter"} onClick={() => setCategory(item)}>{item}</button>)}<button className={favoriteOnly ? "filter active favorite-filter" : "filter favorite-filter"} onClick={() => setFavoriteOnly((current) => !current)}>♥ المفضلة {favorites.length > 0 && `(${favorites.length})`}</button></div>
-          <div className="catalog-tools"><span>{filtered.length} منتج متاح</span><label>ترتيب <select value={sortMode} onChange={(event) => setSortMode(event.target.value)} aria-label="ترتيب المنتجات"><option value="featured">الأبرز أولًا</option><option value="price-low">الأقل سعرًا</option><option value="price-high">الأعلى سعرًا</option><option value="name">حسب الاسم</option></select></label></div>{shareMessage && <p className="share-message" role="status">{shareMessage}</p>}
-          <div className="product-grid">{filtered.map((product) => <article className="product-card" key={product.id}><button className="product-open" onClick={() => setSelectedProduct(product)} aria-label={`عرض تفاصيل ${product.name}`}><div className={`product-visual visual-${categoryClass[product.category]}`}><img src={product.image} alt={product.name} width="900" height="600" loading="lazy" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackImage(product.category); }} /><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{priceText(product.price)}</strong><span className="details-link">التفاصيل</span></div></div></button><div className="card-actions"><button className={favorites.includes(product.id) ? "mini-action active" : "mini-action"} onClick={() => toggleFavorite(product.id)} aria-label={favorites.includes(product.id) ? `إزالة ${product.name} من المفضلة` : `حفظ ${product.name} في المفضلة`}>{favorites.includes(product.id) ? "♥" : "♡"}</button><button className="mini-action" onClick={() => void shareProduct(product)} aria-label={`مشاركة ${product.name}`}>↗</button><button className="add-button card-add" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></article>)}</div>
+          <div className="catalog-tools"><span>{filtered.length.toLocaleString("ar-SA")} منتج متاح</span><label>ترتيب <select value={sortMode} onChange={(event) => setSortMode(event.target.value)} aria-label="ترتيب المنتجات"><option value="featured">الأبرز أولًا</option><option value="price-low">الأقل سعرًا</option><option value="price-high">الأعلى سعرًا</option><option value="name">حسب الاسم</option></select></label></div>{shareMessage && <p className="share-message" role="status">{shareMessage}</p>}
+          <div className="product-grid">{filtered.slice(0, visibleCount).map((product) => <article className="product-card" key={product.id}><button className="product-open" onClick={() => setSelectedProduct(product)} aria-label={`عرض تفاصيل ${product.name}`}><div className={`product-visual visual-${categoryClass[product.category]}`}><img src={product.image} alt={product.name} width="900" height="600" loading="lazy" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackImage(product.category); }} /><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{priceText(product.price)}</strong><span className="details-link">التفاصيل</span></div></div></button><div className="card-actions"><button className={favorites.includes(product.id) ? "mini-action active" : "mini-action"} onClick={() => toggleFavorite(product.id)} aria-label={favorites.includes(product.id) ? `إزالة ${product.name} من المفضلة` : `حفظ ${product.name} في المفضلة`}>{favorites.includes(product.id) ? "♥" : "♡"}</button><button className="mini-action" onClick={() => void shareProduct(product)} aria-label={`مشاركة ${product.name}`}>↗</button><button className="add-button card-add" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></article>)}</div>
+          {visibleCount < filtered.length && <button className="button-soft load-more" onClick={() => setVisibleCount((count) => count + 48)}>عرض المزيد · {Math.min(48, filtered.length - visibleCount).toLocaleString("ar-SA")} منتج</button>}
           {filtered.length === 0 && <div className="empty"><strong>{favoriteOnly ? "ما حفظت منتجات في المفضلة حتى الآن." : "ما لقينا الشيء اللي في بالك."}</strong><span>{favoriteOnly ? "احفظ أي منتج يعجبك ليظهر هنا." : "جرّب كلمة أقصر أو استكشف التصنيفات."}</span>{(query || favoriteOnly || category !== "الكل") && <button className="button-soft empty-reset" onClick={() => { setQuery(""); setFavoriteOnly(false); setCategory("الكل"); }}>عرض كل المنتجات</button>}</div>}
         </section>
 
