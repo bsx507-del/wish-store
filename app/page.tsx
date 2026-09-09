@@ -26,7 +26,7 @@ const imageKeywords: Record<string, string> = {
   "ترفيه": "travel",
 };
 const productImage = (category: string, index: number) =>
-  `https://loremflickr.com/900/600/${imageKeywords[category]}?lock=${index + 410}`;
+  `https://loremflickr.com/900/600/${imageKeywords[category]}?lock=${index + 410}&sig=${index}`;
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
