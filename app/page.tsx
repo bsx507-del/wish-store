@@ -26,7 +26,7 @@ const imageKeywords: Record<string, string> = {
   "🏝️": "private-island", "🏎️": "sports-car", "🏰": "castle", "🚀": "moon-rocket", "🌟": "lucky-star", "☁️": "dream-cloud",
 };
 const productImage = (emoji: string, index: number) =>
-  `https://loremflickr.com/900/600/${imageKeywords[emoji] || "abstract-product"}?lock=${index + 410}&sig=${index}`;
+  `https://image.pollinations.ai/prompt/${encodeURIComponent(`a realistic studio product photograph of ${imageKeywords[emoji] || "a premium digital product"}, centered, clean composition, soft green and black background, no text, no logo`)}?width=900&height=600&seed=${index + 410}&nologo=true`;
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
@@ -91,8 +91,8 @@ export default function Home() {
       if (event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        document.documentElement.style.setProperty("--pointer-x", `${(event.clientX / window.innerWidth) * 100}%`);
-        document.documentElement.style.setProperty("--pointer-y", `${(event.clientY / window.innerHeight) * 100}%`);
+        document.documentElement.style.setProperty("--cursor-x", `${event.clientX}px`);
+        document.documentElement.style.setProperty("--cursor-y", `${event.clientY}px`);
       });
     };
     window.addEventListener("pointermove", moveSurface, { passive: true });
@@ -160,6 +160,7 @@ export default function Home() {
 
   return (
     <main>
+      <div className="liquid-cursor" aria-hidden="true" />
       <a className="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
       <header className="topbar shell">
         <a className="brand" href="#" aria-label="وِشّ، الصفحة الرئيسية"><span className="brand-mark">و</span><span>وِشّ</span></a>
