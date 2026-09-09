@@ -3,7 +3,21 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "وِشّ | اشترِ إحساسًا",
-  description: "متجر رقمي للحظات والهدايا الخفيفة. منتجات افتراضية تُفتح فورًا.",
+  description: "وِشّ متجر ترفيهي عربي لشراء لحظات ومنتجات افتراضية بأسعار رمزية. لا شحن ولا توصيل، فقط تجربة خفيفة وممتعة.",
+  metadataBase: new URL("https://bsx507-del.github.io/wish-store/"),
+  openGraph: {
+    title: "وِشّ | اشترِ الشيء الذي لا تحتاجه",
+    description: "منتجات افتراضية بأسعار رمزية. لا شحن ولا توصيل، فقط لحظة ممتعة.",
+    url: "https://bsx507-del.github.io/wish-store/",
+    siteName: "وِشّ",
+    locale: "ar_SA",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "وِشّ | متجر اللحظات الرقمية",
+    description: "تجربة ترفيهية عربية بمنتجات افتراضية وأسعار رمزية.",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

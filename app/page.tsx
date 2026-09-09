@@ -216,6 +216,17 @@ export default function Home() {
     }
     window.setTimeout(() => setShareMessage(""), 2800);
   };
+  const shareSite = async () => {
+    const shareData = { title: "وِشّ | اشترِ إحساسًا", text: "جرّبوا وِشّ: متجر ترفيهي لمنتجات افتراضية بأسعار رمزية. لا شحن ولا توصيل.", url: window.location.href };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else await navigator.clipboard?.writeText(`${shareData.text} ${shareData.url}`);
+      setShareMessage(navigator.share ? "تم فتح نافذة المشاركة." : "تم نسخ رابط وِشّ.");
+    } catch {
+      setShareMessage("لم تتم المشاركة، يمكنك المحاولة مرة أخرى.");
+    }
+    window.setTimeout(() => setShareMessage(""), 2800);
+  };
 
   const signUp = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -299,7 +310,7 @@ export default function Home() {
             <span className="eyebrow"><i /> مساحة صغيرة لمزاج أفضل</span>
             <h1>اشترِ الشيء<br /><em>الذي لا تحتاجه.</em></h1>
             <p>وِشّ متجر ترفيهي تشتري منه أشياء افتراضية بأسعار رمزية. قهوة، سيارة، جزيرة أو قصر… لا شحن ولا توصيل، فقط لحظة ممتعة.</p>
-            <div className="hero-actions"><button className="button-primary" onClick={() => document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" })}>ابدأ الاستكشاف <Icon name="arrow" /></button><span className="hero-note">منتجات رقمية فقط · تجربة آمنة</span></div>
+            <div className="hero-actions"><button className="button-primary" onClick={() => document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" })}>ابدأ الاستكشاف <Icon name="arrow" /></button><button className="button-soft launch-share" onClick={() => void shareSite()}>شارك وِشّ ↗</button><span className="hero-note">منتجات رقمية فقط · تجربة آمنة</span></div>
           </div>
           <div className="hero-art" aria-hidden="true"><div className="art-orb orb-one" /><div className="art-orb orb-two" /><div className="art-card"><span>01</span><strong>لحظة<br />لك</strong><small>تستحقها اليوم</small></div><div className="art-chip chip-one">✦ هدية رقمية</div><div className="art-chip chip-two">مزاج ↑</div></div>
         </section>
