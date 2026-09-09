@@ -25,15 +25,20 @@ const imageKeywords: Record<string, string> = {
   "⚽": "soccer-ball", "🏀": "basketball", "🚲": "bicycle", "🏋️": "gym-weights", "🎾": "tennis-racket", "👟": "running-shoes", "🪢": "jump-rope",
   "🏝️": "private-island", "🏎️": "sports-car", "🏰": "castle", "🚀": "moon-rocket", "🌟": "lucky-star", "☁️": "dream-cloud",
 };
-const productImage = (emoji: string, index: number) =>
-  `https://image.pollinations.ai/prompt/${encodeURIComponent(`a realistic studio product photograph of ${imageKeywords[emoji] || "a premium digital product"}, centered, clean composition, soft green and black background, no text, no logo`)}?width=900&height=600&seed=${index + 410}&nologo=true`;
+const escapeSvg = (value: string) => value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[character] || character);
+const productImage = (name: string, emoji: string, category: string, index: number) => {
+  const keyword = imageKeywords[emoji] || "premium product";
+  const hue = (index * 47) % 360;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07130d"/><stop offset=".55" stop-color="hsl(${hue} 42% 28%)"/><stop offset="1" stop-color="#b8f56b"/></linearGradient><filter id="blur"><feGaussianBlur stdDeviation="34"/></filter></defs><rect width="900" height="600" fill="url(#g)"/><circle cx="${150 + (index * 37) % 620}" cy="160" r="150" fill="#d7ff8a" opacity=".22" filter="url(#blur)"/><path d="M0 490 C180 380 290 570 460 455 S740 350 900 470 V600 H0Z" fill="#020604" opacity=".72"/><text x="58" y="92" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">${escapeSvg(category.toUpperCase())}</text><text x="58" y="430" fill="#fff" font-family="Arial,sans-serif" font-size="42" font-weight="700">${escapeSvg(keyword.replace(/-/g, " "))}</text><text x="58" y="486" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="28">${escapeSvg(name)}</text><circle cx="760" cy="120" r="58" fill="none" stroke="#d8ff9c" stroke-width="2" opacity=".7"/><circle cx="760" cy="120" r="34" fill="none" stroke="#d8ff9c" stroke-width="1" opacity=".55"/></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+};
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
   category,
   price: halalaPrice,
   emoji,
-  image: productImage(emoji, index),
+  image: productImage(name, emoji, category, index),
   tag: index === 0 ? "الأكثر طلبًا" : index === 65 ? "مميز" : index === 1 ? "جديد" : undefined,
   description: "منتج افتراضي للمتعة فقط، لا يوجد شحن أو توصيل",
 }));
