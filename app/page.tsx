@@ -72,7 +72,13 @@ export default function Home() {
     setUser(nextUser);
     window.localStorage.setItem("wish-user", JSON.stringify(nextUser));
     setAuthError("");
-    setAuthMessage("تم إنشاء حسابك محليًا. ربط البريد الفعلي يحتاج مزود إرسال بريد في مرحلة الإطلاق.");
+    if (cartItems.length > 0) {
+      setAuthMessage("");
+      setAuthOpen(false);
+      setCheckoutOpen(true);
+    } else {
+      setAuthMessage("تم إنشاء حسابك محليًا. ربط البريد الفعلي يحتاج مزود إرسال بريد في مرحلة الإطلاق.");
+    }
   };
 
   const claimReward = () => {
