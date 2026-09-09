@@ -59,10 +59,21 @@ const productPhotos: Record<string, string> = {
   "🎧": "photo-1505740420928-5e560c06d30e", "⌚": "photo-1523275335684-37898b6baf30", "📱": "photo-1511707171634-5f897ff02aa9", "💻": "photo-1496181133206-80ce9b88a853", "📷": "photo-1516035069371-29a1b244cc32", "📺": "photo-1593359677879-a4bb92f829d1", "⌨️": "photo-1587829741301-dc798b83add3", "🖱️": "photo-1527814050087-3793815479db", "🖨️": "photo-1612815154858-60aa4c59eaa6", "🎮": "photo-1600080972464-8e5f35f63d08", "🎙️": "photo-1590602847861-f357a9332bbc",
   "👕": "photo-1521572163474-6864f9cf17ab", "🕶️": "photo-1511499767150-a48a237f0083", "👜": "photo-1584917865442-de89df76afd3", "🎒": "photo-1553062407-98eeb64c6a62", "💍": "photo-1605100804763-247f67b3557e", "💎": "photo-1515562141207-7a88fb7ce338", "🧥": "photo-1551488831-00ddcb6c6bd3", "👑": "photo-1535632066927-ab7c9ab60908",
   "🛋️": "photo-1555041469-a586c61ea9bc", "🛏️": "photo-1505693416388-ac5ce068fe85", "💡": "photo-1507473885765-e6ed057f782c", "🕯️": "photo-1603006905003-be475563bc59", "🪴": "photo-1485955900006-10f4d324d411", "🖼️": "photo-1549490349-8643362247b5", "🚪": "photo-1513694203232-719a280e022f", "🛁": "photo-1584622650111-993a426fbf0a",
-  "⚽": "photo-1553778263-73a83bab9b0c", "🏀": "photo-1546519638-68e109498ffc", "🚲": "photo-1485965120184-e220f721d03e", "🏋️": "photo-1534438327276-14e5300c3a48", "🎾": "photo-1617083934555-5bfa0e4e2ebf", "👟": "photo-1542291026-7eec264c27ff", "🪢": "photo-1599058917212-d750089bc07e",
-  "🏝️": "photo-1500534623283-312aade485b7", "🏎️": "photo-1503736334956-4c8f8e92946d", "🏰": "photo-1539650116574-75c0c6d73f6e", "🚀": "photo-1446776811953-b23d57bd21aa", "🌟": "photo-1519608487953-e999c86e7455", "☁️": "photo-1499346030926-9a72daac6c63",
+  "⚽": "photo-1553778263-73a83bab9b0c", "🏀": "photo-1546519638-68e109498ffc", "🚲": "photo-1485965120184-e220f721d03e", "🏋️": "photo-1534438327276-14e5300c3a48", "🎾": "photo-1554068865-24cecd4e34b8", "👟": "photo-1542291026-7eec264c27ff", "🪢": "photo-1599058917212-d750089bc07e",
+  "🏝️": "photo-1500534623283-312aade485b7", "🏎️": "photo-1503736334956-4c8f8e92946d", "🏰": "photo-1548013146-72479768bada", "🚀": "photo-1446776811953-b23d57bd21aa", "🌟": "photo-1519608487953-e999c86e7455", "☁️": "photo-1499346030926-9a72daac6c63",
 };
 const productImage = (emoji: string) => `https://images.unsplash.com/${productPhotos[emoji] || "photo-1494438639946-1ebd1d20bf85"}?auto=format&fit=crop&w=900&q=88`;
+const fallbackPhotos: Record<string, string> = {
+  "أكل": "photo-1568901346375-23c9450c58cd",
+  "مشروبات": "photo-1558857563-b371033873b8",
+  "حلويات": "photo-1551024506-0bccd828d307",
+  "إلكترونيات": "photo-1496181133206-80ce9b88a853",
+  "موضة": "photo-1521572163474-6864f9cf17ab",
+  "المنزل": "photo-1555041469-a586c61ea9bc",
+  "رياضة": "photo-1542291026-7eec264c27ff",
+  "ترفيه": "photo-1500534623283-312aade485b7",
+};
+const fallbackImage = (category: string) => `https://images.unsplash.com/${fallbackPhotos[category]}?auto=format&fit=crop&w=900&q=88`;
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
@@ -224,7 +235,7 @@ export default function Home() {
         <section id="shop" className="shop-section">
           <div className="section-heading"><div><span className="section-kicker">المتجر الافتراضي</span><h2>وش تشتري لو ما فيه حدود؟</h2><p>تصفح أشياء ممتعة، رمزية، ولا تصل إلى باب بيتك.</p></div><label className="search-box"><Icon name="search" /><input aria-label="ابحث في المنتجات" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن قهوة، جزيرة…" /></label></div>
           <div className="filters" aria-label="تصنيف المنتجات">{categories.map((item) => <button key={item} className={category === item ? "filter active" : "filter"} onClick={() => setCategory(item)}>{item}</button>)}</div>
-          <div className="product-grid">{filtered.map((product) => <article className="product-card" key={product.id}><div className={`product-visual visual-${categoryClass[product.category]}`}><img src={product.image} alt={product.name} width="900" height="600" loading="lazy" /><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{priceText(product.price)}</strong><button className="add-button" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></div></article>)}</div>
+          <div className="product-grid">{filtered.map((product) => <article className="product-card" key={product.id}><div className={`product-visual visual-${categoryClass[product.category]}`}><img src={product.image} alt={product.name} width="900" height="600" loading="lazy" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackImage(product.category); }} /><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{priceText(product.price)}</strong><button className="add-button" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></div></article>)}</div>
           {filtered.length === 0 && <div className="empty">لم نجد ما تبحث عنه. جرّب كلمة أخرى…</div>}
         </section>
 
