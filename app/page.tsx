@@ -52,19 +52,24 @@ const productArtwork = (emoji: string, hue: number) => {
   }
   return `<circle cx="450" cy="305" r="155" fill="${fill}" stroke="${stroke}" stroke-width="10"/><circle cx="450" cy="305" r="95" fill="#06100a" stroke="${stroke}" stroke-width="6"/><path d="M450 110v390M255 305h390" stroke="${stroke}" stroke-width="5" opacity=".55"/><ellipse cx="450" cy="490" rx="220" ry="25" fill="#010403" opacity=".5"/>`;
 };
-const productImage = (name: string, emoji: string, category: string, index: number) => {
-  const keyword = imageKeywords[emoji] || "premium product";
-  const hue = (index * 47) % 360;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07130d"/><stop offset=".55" stop-color="hsl(${hue} 42% 28%)"/><stop offset="1" stop-color="#b8f56b"/></linearGradient></defs><rect width="900" height="600" fill="url(#g)"/><path d="M0 520 C180 435 300 580 470 475 S740 395 900 490 V600 H0Z" fill="#020604" opacity=".72"/>${productArtwork(emoji, hue)}<text x="58" y="92" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">${escapeSvg(category.toUpperCase())}</text><text x="58" y="555" fill="#d8ff9c" font-family="Arial,sans-serif" font-size="26">${escapeSvg(name)}</text></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+const productPhotos: Record<string, string> = {
+  "🍔": "photo-1568901346375-23c9450c58cd", "🍕": "photo-1574071318508-1cdbab80d002", "🥪": "photo-1528735602780-2552fd46c7af", "🥗": "photo-1546793665-c74683f339c1", "🍲": "photo-1547592180-85f173990554", "🍳": "photo-1525351484163-7529414344d8", "🥖": "photo-1509440159596-0249088772ff", "🧀": "photo-1486297678162-eb2a19b0a32d", "🥩": "photo-1546833999-b9f581a1996d", "🐟": "photo-1519708227418-c8fd9a32b2a2", "🍎": "photo-1560806887-1e4cd0b6cbd6", "🍒": "photo-1528825871115-3581a5387919", "🥕": "photo-1445282768818-728615cc910a", "🍄": "photo-1504674900247-0877df9cc836", "🍿": "photo-1585647347483-22b66260dfff",
+  "🥤": "photo-1544145945-f90425340c7e", "🧋": "photo-1558857563-b371033873b8", "🍵": "photo-1544787219-7f47ccb76574", "🥭": "photo-1623065422902-30a2d299bbe4", "🍊": "photo-1600271886742-f049cd451bba", "☕": "photo-1495474472287-4d71bcdd2085", "🥛": "photo-1572449043416-55f4685c9bb7", "🍹": "photo-1551024709-8f23befc6f87", "🍋": "photo-1513558161293-cdaf765ed2fd", "💧": "photo-1559825481-12a05cc00344",
+  "🍩": "photo-1551024506-0bccd828d307", "🍓": "photo-1497034825429-c343d7c6a68f", "🍰": "photo-1578985545062-69928b1d9587", "🍫": "photo-1575377427642-087cf684f29d", "🍬": "photo-1582058091505-f87a2e55a40f", "🍪": "photo-1499636136210-6f4ee915583e", "🧁": "photo-1559622214-f8a9850965bb", "🫐": "photo-1558961363-fa8fdf82db35",
+  "🎧": "photo-1505740420928-5e560c06d30e", "⌚": "photo-1523275335684-37898b6baf30", "📱": "photo-1511707171634-5f897ff02aa9", "💻": "photo-1496181133206-80ce9b88a853", "📷": "photo-1516035069371-29a1b244cc32", "📺": "photo-1593359677879-a4bb92f829d1", "⌨️": "photo-1587829741301-dc798b83add3", "🖱️": "photo-1527814050087-3793815479db", "🖨️": "photo-1612815154858-60aa4c59eaa6", "🎮": "photo-1600080972464-8e5f35f63d08", "🎙️": "photo-1590602847861-f357a9332bbc",
+  "👕": "photo-1521572163474-6864f9cf17ab", "🕶️": "photo-1511499767150-a48a237f0083", "👜": "photo-1584917865442-de89df76afd3", "🎒": "photo-1553062407-98eeb64c6a62", "💍": "photo-1605100804763-247f67b3557e", "💎": "photo-1515562141207-7a88fb7ce338", "🧥": "photo-1551488831-00ddcb6c6bd3", "👑": "photo-1535632066927-ab7c9ab60908",
+  "🛋️": "photo-1555041469-a586c61ea9bc", "🛏️": "photo-1505693416388-ac5ce068fe85", "💡": "photo-1507473885765-e6ed057f782c", "🕯️": "photo-1603006905003-be475563bc59", "🪴": "photo-1485955900006-10f4d324d411", "🖼️": "photo-1549490349-8643362247b5", "🚪": "photo-1513694203232-719a280e022f", "🛁": "photo-1584622650111-993a426fbf0a",
+  "⚽": "photo-1553778263-73a83bab9b0c", "🏀": "photo-1546519638-68e109498ffc", "🚲": "photo-1485965120184-e220f721d03e", "🏋️": "photo-1534438327276-14e5300c3a48", "🎾": "photo-1617083934555-5bfa0e4e2ebf", "👟": "photo-1542291026-7eec264c27ff", "🪢": "photo-1599058917212-d750089bc07e",
+  "🏝️": "photo-1500534623283-312aade485b7", "🏎️": "photo-1503736334956-4c8f8e92946d", "🏰": "photo-1539650116574-75c0c6d73f6e", "🚀": "photo-1446776811953-b23d57bd21aa", "🌟": "photo-1519608487953-e999c86e7455", "☁️": "photo-1499346030926-9a72daac6c63",
 };
+const productImage = (emoji: string) => `https://images.unsplash.com/${productPhotos[emoji] || "photo-1494438639946-1ebd1d20bf85"}?auto=format&fit=crop&w=900&q=88`;
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
   category,
   price: halalaPrice,
   emoji,
-  image: productImage(name, emoji, category, index),
+  image: productImage(emoji),
   tag: index === 0 ? "الأكثر طلبًا" : index === 65 ? "مميز" : index === 1 ? "جديد" : undefined,
   description: "منتج افتراضي للمتعة فقط، لا يوجد شحن أو توصيل",
 }));
