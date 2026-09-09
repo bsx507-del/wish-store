@@ -15,22 +15,25 @@ const catalogSeed: Array<[string, number, string, string]> = [
   ["كرة قدم", 22, "⚽", "رياضة"], ["كرة سلة", 24, "🏀", "رياضة"], ["دراجة هوائية", 50, "🚲", "رياضة"], ["أثقال رياضية", 32, "🏋️", "رياضة"], ["مضرب تنس", 28, "🎾", "رياضة"], ["حذاء رياضي", 35, "👟", "رياضة"], ["حبل قفز", 10, "🪢", "رياضة"],
   ["جزيرة خاصة", 80, "🏝️", "ترفيه"], ["سيارة أحلامك", 75, "🏎️", "ترفيه"], ["قصر على السحاب", 120, "🏰", "ترفيه"], ["رحلة إلى القمر", 60, "🚀", "ترفيه"], ["نجمة الحظ", 2, "🌟", "ترفيه"], ["سحابة أمنيات", 5, "☁️", "ترفيه"],
 ];
+const imageKeywords: Record<string, string> = {
+  "أكل": "food",
+  "مشروبات": "drinks",
+  "حلويات": "dessert",
+  "إلكترونيات": "technology",
+  "موضة": "fashion",
+  "المنزل": "interior",
+  "رياضة": "fitness",
+  "ترفيه": "travel",
+};
+const productImage = (category: string, index: number) =>
+  `https://loremflickr.com/900/600/${imageKeywords[category]}?lock=${index + 410}`;
 const products: Product[] = catalogSeed.map(([name, halalaPrice, emoji, category], index) => ({
   id: index + 1,
   name,
   category,
   price: halalaPrice,
   emoji,
-  image: ({
-    "أكل": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85",
-    "مشروبات": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",
-    "حلويات": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=85",
-    "إلكترونيات": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=85",
-    "موضة": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=85",
-    "المنزل": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85",
-    "رياضة": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=85",
-    "ترفيه": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=85",
-  } as Record<string, string>)[category],
+  image: productImage(category, index),
   tag: index === 0 ? "الأكثر طلبًا" : index === 65 ? "مميز" : index === 1 ? "جديد" : undefined,
   description: "منتج افتراضي للمتعة فقط، لا يوجد شحن أو توصيل",
 }));
