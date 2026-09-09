@@ -199,8 +199,8 @@ export default function Home() {
       return;
     }
     setWallet(wallet - payable);
-    const orderId = `W-${Date.now().toString(36).toUpperCase()}`;
-    setOrders((current) => [{ id: orderId, createdAt: new Date().toISOString(), total: payable, itemCount: count, status: "محاكاة مكتملة" }, ...current].slice(0, 20));
+    const newOrder: Order = { id: `W-${Date.now().toString(36).toUpperCase()}`, createdAt: new Date().toISOString(), total: payable, itemCount: count, status: "محاكاة مكتملة" };
+    setOrders((current) => [newOrder, ...current].slice(0, 20));
     setOrderComplete(true);
   };
   const startCheckout = () => {
