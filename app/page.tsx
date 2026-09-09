@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Product = { id: number; name: string; category: string; price: number; emoji: string; tag?: string; description: string };
 
@@ -24,13 +24,30 @@ export default function Home() {
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [complete, setComplete] = useState(false);
+  const [reward, setReward] = useState(0);
+  const [rewardMessage, setRewardMessage] = useState("");
 
   const filtered = useMemo(() => products.filter((p) => (category === "الكل" || p.category === category) && p.name.includes(query)), [category, query]);
   const cartItems = products.filter((p) => cart[p.id]);
   const count = Object.values(cart).reduce((a, b) => a + b, 0);
   const total = cartItems.reduce((sum, p) => sum + p.price * (cart[p.id] || 0), 0);
+  useEffect(() => {
+    const saved = window.localStorage.getItem("wish-cart");
+    if (saved) setCart(JSON.parse(saved) as Record<number, number>);
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem("wish-cart", JSON.stringify(cart));
+  }, [cart]);
   const add = (id: number) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
   const remove = (id: number) => setCart((c) => { const next = { ...c, [id]: (c[id] || 0) - 1 }; if (next[id] <= 0) delete next[id]; return next; });
+  const claimReward = () => {
+    if (reward > 0) {
+      setRewardMessage("أخذت مكافأتك اليوم — ارجع بكرة لمفاجأة جديدة ✨");
+      return;
+    }
+    setReward(25);
+    setRewardMessage("وصلتك ٢٥ هللة رمزية لرصيدك. بدون إعلانات مزعجة 💜");
+  };
 
   return (
     <main>
@@ -70,7 +87,7 @@ export default function Home() {
         <section className="trust" id="how">
           <div className="trust-item"><span className="trust-icon">🎈</span><div><h3>كلها افتراضية</h3><p>لا يوجد شحن أو توصيل. أنت تشتري لحظة، مو منتجًا حقيقيًا.</p></div></div>
           <div className="trust-item"><span className="trust-icon">🔒</span><div><h3>دفع تجريبي وآمن</h3><p>لا نطلب بيانات بطاقتك. هذه تجربة محاكاة للمتعة فقط.</p></div></div>
-          <div className="trust-item" id="rewards"><span className="trust-icon">🎁</span><div><h3>مكافآت بدون إزعاج</h3><p>شاهد إعلانًا اختياريًا واحصل على هللات رمزية تضاف لرصيدك.</p></div></div>
+          <div className="trust-item reward-card" id="rewards"><span className="trust-icon">🎁</span><div><h3>مكافآت بدون إزعاج</h3><p>مكافأة يومية اختيارية بدل الإعلانات المزعجة. لا نطلب تسجيلًا أو بيانات شخصية.</p><button className="reward-button" onClick={claimReward}>{reward > 0 ? "تم استلام المكافأة" : "استلام ٢٥ هللة"}</button>{rewardMessage && <small className="reward-message">{rewardMessage}</small>}</div></div>
         </section>
         <footer className="footer"><span>© 2024 وِشّ — متجر الأمنيات الافتراضي</span><span>للضحكة فقط، لا نبيع أشياء حقيقية 💜</span></footer>
       </div>
