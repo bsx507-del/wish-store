@@ -218,10 +218,11 @@ export default function Home() {
   };
   const shareSite = async () => {
     const shareData = { title: "وِشّ | اشترِ إحساسًا", text: "جرّبوا وِشّ: متجر ترفيهي لمنتجات افتراضية بأسعار رمزية. لا شحن ولا توصيل.", url: window.location.href };
+    const canShare = Boolean(navigator.share);
     try {
-      if (navigator.share) await navigator.share(shareData);
+      if (canShare) await navigator.share(shareData);
       else await navigator.clipboard?.writeText(`${shareData.text} ${shareData.url}`);
-      setShareMessage(navigator.share ? "تم فتح نافذة المشاركة." : "تم نسخ رابط وِشّ.");
+      setShareMessage(canShare ? "تم فتح نافذة المشاركة." : "تم نسخ رابط وِشّ.");
     } catch {
       setShareMessage("لم تتم المشاركة، يمكنك المحاولة مرة أخرى.");
     }
