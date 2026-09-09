@@ -169,6 +169,26 @@ export default function Home() {
       window.removeEventListener("pointermove", moveSurface);
     };
   }, []);
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setSelectedProduct(null);
+      setSelectedOrder(null);
+      setLegalOpen(null);
+      setCartOpen(false);
+      setCheckoutOpen(false);
+      setAuthOpen(false);
+      setSettingsOpen(false);
+      setWalletOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+  useEffect(() => {
+    const modalOpen = Boolean(selectedProduct || selectedOrder || legalOpen || cartOpen || checkoutOpen || authOpen || settingsOpen || walletOpen);
+    document.body.style.overflow = modalOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [selectedProduct, selectedOrder, legalOpen, cartOpen, checkoutOpen, authOpen, settingsOpen, walletOpen]);
 
   const filtered = useMemo(() => {
     const result = products.filter((p) => (category === "الكل" || p.category === category) && p.name.includes(query) && (!favoriteOnly || favorites.includes(p.id)));
