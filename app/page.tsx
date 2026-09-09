@@ -5,21 +5,27 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 type Product = { id: number; name: string; category: string; price: number; emoji: string; tag?: string; description: string };
 type User = { email: string; joinedAt: string };
 
-const products: Product[] = [
-  { id: 1, name: "قهوة على حسابنا", category: "أكل وشرب", price: 99, emoji: "☕", tag: "الأكثر طلبًا", description: "كوب افتراضي يضبط مزاج يومك" },
-  { id: 2, name: "بيتزا منتصف الليل", category: "أكل وشرب", price: 199, emoji: "🍕", description: "قطعة خيالية بلا سعرات ولا توصيل" },
-  { id: 3, name: "تذكرة جزيرة", category: "سفر وخيال", price: 299, emoji: "🏝️", tag: "جديد", description: "اهرب لجزيرتك الخاصة لمدة دقيقة" },
-  { id: 4, name: "سيارة أحلامك", category: "رفاهية", price: 499, emoji: "🏎️", description: "اختر لونها وقدها بخيالك" },
-  { id: 5, name: "قصر على السحاب", category: "رفاهية", price: 999, emoji: "🏰", description: "عنوان فاخر في عالمك الافتراضي" },
-  { id: 6, name: "نجمة الحظ", category: "رموز", price: 49, emoji: "🌟", tag: "خفيف", description: "رمز صغير ليوم مليء بالحظ" },
-  { id: 7, name: "باقة فرح", category: "هدايا", price: 199, emoji: "💐", description: "أرسل وردًا لا يذبل لمن تحب" },
-  { id: 8, name: "تاج اليوم", category: "هدايا", price: 299, emoji: "👑", description: "تذكير لطيف بأنك تستحق الأفضل" },
-  { id: 9, name: "جلسة فضفضة", category: "مزاج", price: 399, emoji: "🫶", description: "مساحة افتراضية ترتب فيها أفكارك" },
-  { id: 10, name: "موجة هدوء", category: "مزاج", price: 149, emoji: "🌊", description: "صوت قصير يهدئ يومك" },
-  { id: 11, name: "سحابة أمنيات", category: "رموز", price: 249, emoji: "☁️", description: "اكتب أمنيتك واتركها تطير" },
-  { id: 12, name: "صاروخ إلى القمر", category: "سفر وخيال", price: 699, emoji: "🚀", tag: "مميز", description: "رحلة ذهاب فقط إلى خيالك" },
+const catalogSeed: Array<[string, number, string, string]> = [
+  ["برجر مشوي دبل", 18, "🍔", "أكل"], ["بيتزا حارة", 15, "🍕", "أكل"], ["ساندوتش دجاج", 13, "🥪", "أكل"], ["سلطة سيزر", 10, "🥗", "أكل"], ["شوربة عدس", 8, "🍲", "أكل"], ["بيض مقلي", 6, "🍳", "أكل"], ["خبز فرنسي", 5, "🥖", "أكل"], ["جبنة موزاريلا", 9, "🧀", "أكل"], ["لحم مشوي", 22, "🥩", "أكل"], ["سمك مشوي", 20, "🐟", "أكل"], ["تفاح أحمر", 4, "🍎", "أكل"], ["كرز طازج", 7, "🍒", "أكل"], ["جزر طازج", 3, "🥕", "أكل"], ["مشروم مشوي", 6, "🍄", "أكل"], ["فشار بالزبدة", 5, "🍿", "أكل"],
+  ["مشروب غازي بارد", 8, "🥤", "مشروبات"], ["قهوة مثلجة كراميل", 12, "🧋", "مشروبات"], ["شاي كرك دافئ", 6, "🍵", "مشروبات"], ["عصير مانجو طازج", 11, "🥭", "مشروبات"], ["عصير برتقال", 9, "🍊", "مشروبات"], ["قهوة إسبريسو", 10, "☕", "مشروبات"], ["حليب بالشوكولاتة", 7, "🥛", "مشروبات"], ["موهيتو منعش", 14, "🍹", "مشروبات"], ["عصير ليمون بالنعناع", 8, "🍋", "مشروبات"], ["ماء فوار", 4, "💧", "مشروبات"],
+  ["دونات بالشوكولاتة", 9, "🍩", "حلويات"], ["آيس كريم فراولة", 10, "🍓", "حلويات"], ["كيكة شوكولاتة", 16, "🍰", "حلويات"], ["شوكولاتة فاخرة", 14, "🍫", "حلويات"], ["حلوى ملبس", 6, "🍬", "حلويات"], ["كوكيز بالمكسرات", 8, "🍪", "حلويات"], ["بقلاوة", 12, "🧁", "حلويات"], ["مافن بالتوت", 9, "🫐", "حلويات"],
+  ["سماعات لاسلكية", 45, "🎧", "إلكترونيات"], ["ساعة ذكية", 50, "⌚", "إلكترونيات"], ["جوال حديث", 50, "📱", "إلكترونيات"], ["لابتوب رفيع", 50, "💻", "إلكترونيات"], ["كاميرا احترافية", 48, "📷", "إلكترونيات"], ["شاشة تلفزيون", 50, "📺", "إلكترونيات"], ["لوحة مفاتيح", 30, "⌨️", "إلكترونيات"], ["ماوس لاسلكي", 20, "🖱️", "إلكترونيات"], ["طابعة صغيرة", 40, "🖨️", "إلكترونيات"], ["يد تحكم ألعاب", 35, "🎮", "إلكترونيات"], ["مايكروفون بودكاست", 33, "🎙️", "إلكترونيات"],
+  ["تيشيرت قطن", 20, "👕", "موضة"], ["نظارة شمسية", 40, "🕶️", "موضة"], ["حقيبة يد", 35, "👜", "موضة"], ["شنطة ظهر", 30, "🎒", "موضة"], ["خاتم فضة", 25, "💍", "موضة"], ["قلادة ألماس", 50, "💎", "موضة"], ["شماعة أزياء", 15, "🧥", "موضة"], ["تاج ملكي", 45, "👑", "موضة"],
+  ["أريكة مريحة", 50, "🛋️", "المنزل"], ["سرير مريح", 50, "🛏️", "المنزل"], ["لمبة إضاءة", 18, "💡", "المنزل"], ["شمعة معطرة", 12, "🕯️", "المنزل"], ["نبتة زينة", 15, "🪴", "المنزل"], ["لوحة فنية", 28, "🖼️", "المنزل"], ["باب خشبي", 45, "🚪", "المنزل"], ["حوض استحمام", 50, "🛁", "المنزل"],
+  ["كرة قدم", 22, "⚽", "رياضة"], ["كرة سلة", 24, "🏀", "رياضة"], ["دراجة هوائية", 50, "🚲", "رياضة"], ["أثقال رياضية", 32, "🏋️", "رياضة"], ["مضرب تنس", 28, "🎾", "رياضة"], ["حذاء رياضي", 35, "👟", "رياضة"], ["حبل قفز", 10, "🪢", "رياضة"],
+  ["جزيرة خاصة", 80, "🏝️", "ترفيه"], ["سيارة أحلامك", 75, "🏎️", "ترفيه"], ["قصر على السحاب", 120, "🏰", "ترفيه"], ["رحلة إلى القمر", 60, "🚀", "ترفيه"], ["نجمة الحظ", 2, "🌟", "ترفيه"], ["سحابة أمنيات", 5, "☁️", "ترفيه"],
 ];
-const categories = ["الكل", "أكل وشرب", "سفر وخيال", "رفاهية", "هدايا", "رموز", "مزاج"];
+const products: Product[] = catalogSeed.map(([name, riyals, emoji, category], index) => ({
+  id: index + 1,
+  name,
+  category,
+  price: riyals * 100,
+  emoji,
+  tag: index === 0 ? "الأكثر طلبًا" : index === 65 ? "مميز" : index === 1 ? "جديد" : undefined,
+  description: "منتج افتراضي للمتعة فقط، لا يوجد شحن أو توصيل",
+}));
+const categories = ["الكل", "أكل", "مشروبات", "حلويات", "إلكترونيات", "موضة", "المنزل", "رياضة", "ترفيه"];
+const categoryClass: Record<string, string> = { "أكل": "food", "مشروبات": "drinks", "حلويات": "desserts", "إلكترونيات": "tech", "موضة": "fashion", "المنزل": "home", "رياضة": "sports", "ترفيه": "fun" };
 const currency = new Intl.NumberFormat("ar-SA", { style: "currency", currency: "SAR", minimumFractionDigits: 2 });
 const halalas = (value: number) => `${value.toLocaleString("ar-SA")} هللة`;
 
@@ -131,7 +137,7 @@ export default function Home() {
         <section id="shop" className="shop-section">
           <div className="section-heading"><div><span className="section-kicker">المتجر الافتراضي</span><h2>وش تشتري لو ما فيه حدود؟</h2><p>تصفح أشياء ممتعة، رمزية، ولا تصل إلى باب بيتك.</p></div><label className="search-box"><Icon name="search" /><input aria-label="ابحث في المنتجات" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن قهوة، جزيرة…" /></label></div>
           <div className="filters" aria-label="تصنيف المنتجات">{categories.map((item) => <button key={item} className={category === item ? "filter active" : "filter"} onClick={() => setCategory(item)}>{item}</button>)}</div>
-          <div className="product-grid">{filtered.map((product) => <article className="product-card" key={product.id}><div className={`product-visual visual-${product.id}`}><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{currency.format(product.price / 100)}</strong><button className="add-button" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></div></article>)}</div>
+          <div className="product-grid">{filtered.map((product) => <article className="product-card" key={product.id}><div className={`product-visual visual-${categoryClass[product.category]}`}><span>{product.emoji}</span><i>✦</i>{product.tag && <b>{product.tag}</b>}</div><div className="product-info"><span className="product-category">{product.category}</span><h3>{product.name}</h3><p>{product.description}</p><div className="product-bottom"><strong>{currency.format(product.price / 100)}</strong><button className="add-button" onClick={() => add(product.id)} aria-label={`إضافة ${product.name} إلى السلة`}>أضف <Icon name="cart" /></button></div></div></article>)}</div>
           {filtered.length === 0 && <div className="empty">لم نجد ما تبحث عنه. جرّب كلمة أخرى…</div>}
         </section>
 
