@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     title: "وِشّ | متجر اللحظات الرقمية",
     description: "تجربة ترفيهية عربية بمنتجات افتراضية وأسعار رمزية.",
   },
+  alternates: {
+    canonical: "https://bsx507-del.github.io/wish-store/",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
