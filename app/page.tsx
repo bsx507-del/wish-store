@@ -141,6 +141,7 @@ export default function Home() {
   const [legalOpen, setLegalOpen] = useState<"faq" | "terms" | "privacy" | null>(null);
   const [shareMessage, setShareMessage] = useState("");
   const [isPaying, setIsPaying] = useState(false);
+  const [urlReady, setUrlReady] = useState(false);
 
   useEffect(() => {
     setCart(readStorage<Record<number, number>>("wish-cart", {}));
@@ -150,8 +151,16 @@ export default function Home() {
     setFavorites(readStorage<number[]>("wish-favorites", []));
     setEmailUpdates(readStorage<boolean>("wish-email-updates", true));
     setReward(readStorage<string>("wish-reward-date", "") === new Date().toISOString().slice(0, 10));
-    const productId = Number(new URLSearchParams(window.location.search).get("product"));
+    const params = new URLSearchParams(window.location.search);
+    const urlCategory = params.get("category");
+    const urlSort = params.get("sort");
+    setCategory(categories.includes(urlCategory || "") ? urlCategory || "الكل" : "الكل");
+    setQuery(params.get("q") || "");
+    setSortMode(["featured", "price-low", "price-high", "name"].includes(urlSort || "") ? urlSort || "featured" : "featured");
+    setFavoriteOnly(params.get("favorites") === "1");
+    const productId = Number(params.get("product"));
     if (productId) setSelectedProduct(products.find((product) => product.id === productId) || null);
+    setUrlReady(true);
   }, []);
   useEffect(() => { window.localStorage.setItem("wish-cart", JSON.stringify(cart)); }, [cart]);
   useEffect(() => { window.localStorage.setItem("wish-wallet", String(wallet)); }, [wallet]);
@@ -195,11 +204,16 @@ export default function Home() {
     return () => { document.body.style.overflow = ""; };
   }, [selectedProduct, selectedOrder, legalOpen, cartOpen, checkoutOpen, authOpen, settingsOpen, walletOpen]);
   useEffect(() => {
+    if (!urlReady) return;
     const url = new URL(window.location.href);
     if (selectedProduct) url.searchParams.set("product", String(selectedProduct.id));
     else url.searchParams.delete("product");
+    if (query) url.searchParams.set("q", query); else url.searchParams.delete("q");
+    if (category !== "الكل") url.searchParams.set("category", category); else url.searchParams.delete("category");
+    if (sortMode !== "featured") url.searchParams.set("sort", sortMode); else url.searchParams.delete("sort");
+    if (favoriteOnly) url.searchParams.set("favorites", "1"); else url.searchParams.delete("favorites");
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-  }, [selectedProduct]);
+  }, [urlReady, selectedProduct, query, category, sortMode, favoriteOnly]);
 
   const filtered = useMemo(() => {
     const normalizedQuery = normalizeArabic(query);
