@@ -194,6 +194,12 @@ export default function Home() {
     document.body.style.overflow = modalOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [selectedProduct, selectedOrder, legalOpen, cartOpen, checkoutOpen, authOpen, settingsOpen, walletOpen]);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (selectedProduct) url.searchParams.set("product", String(selectedProduct.id));
+    else url.searchParams.delete("product");
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [selectedProduct]);
 
   const filtered = useMemo(() => {
     const normalizedQuery = normalizeArabic(query);
@@ -213,9 +219,11 @@ export default function Home() {
       if (navigator.share) {
         await navigator.share(shareData);
         setShareMessage("تم فتح نافذة المشاركة.");
-      } else {
-        await navigator.clipboard?.writeText(`${shareData.text} ${shareData.url}`);
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
         setShareMessage("تم نسخ رابط المنتج.");
+      } else {
+        setShareMessage("انسخ رابط الصفحة يدويًا لمشاركة المنتج.");
       }
     } catch {
       setShareMessage("لم تتم المشاركة، يمكنك المحاولة مرة أخرى.");
@@ -227,8 +235,10 @@ export default function Home() {
     const canShare = Boolean(navigator.share);
     try {
       if (canShare) await navigator.share(shareData);
-      else await navigator.clipboard?.writeText(`${shareData.text} ${shareData.url}`);
-      setShareMessage(canShare ? "تم فتح نافذة المشاركة." : "تم نسخ رابط وِشّ.");
+      else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+        setShareMessage("تم نسخ رابط وِشّ.");
+      } else setShareMessage("انسخ رابط الصفحة يدويًا لمشاركة وِشّ.");
     } catch {
       setShareMessage("لم تتم المشاركة، يمكنك المحاولة مرة أخرى.");
     }
