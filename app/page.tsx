@@ -139,10 +139,13 @@ export default function Home() {
     setUser(readStorage<User | null>("wish-user", null));
     setWallet(readStorage<number>("wish-wallet", 0));
     setOrders(readStorage<Order[]>("wish-orders", []));
+    setEmailUpdates(readStorage<boolean>("wish-email-updates", true));
+    setReward(readStorage<string>("wish-reward-date", "") === new Date().toISOString().slice(0, 10));
   }, []);
   useEffect(() => { window.localStorage.setItem("wish-cart", JSON.stringify(cart)); }, [cart]);
   useEffect(() => { window.localStorage.setItem("wish-wallet", String(wallet)); }, [wallet]);
   useEffect(() => { window.localStorage.setItem("wish-orders", JSON.stringify(orders)); }, [orders]);
+  useEffect(() => { window.localStorage.setItem("wish-email-updates", String(emailUpdates)); }, [emailUpdates]);
   useEffect(() => {
     let frame = 0;
     const moveSurface = (event: PointerEvent) => {
@@ -192,7 +195,10 @@ export default function Home() {
       setRewardMessage("استلمت مكافأتك اليوم. ارجع غدًا لمفاجأة جديدة.");
       return;
     }
+    const today = new Date().toISOString().slice(0, 10);
     setReward(true);
+    setWallet((current) => current + 25);
+    window.localStorage.setItem("wish-reward-date", today);
     setRewardMessage("أضفنا ٢٥ هللة رمزية لرصيدك التجريبي.");
   };
   const payOrder = () => {
