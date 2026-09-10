@@ -36,6 +36,10 @@ alter table public.products enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 
+drop policy if exists "Anyone can read active products" on public.products;
+drop policy if exists "Users can read their own orders" on public.orders;
+drop policy if exists "Users can read their own order items" on public.order_items;
+
 create policy "Anyone can read active products"
   on public.products for select
   using (active = true);
